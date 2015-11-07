@@ -1,1 +1,156 @@
-<h1> hey there </h1>
+<!-- Include JQuery -->
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<style>
+  button {
+    margin-right: 10px;
+  }
+
+
+</style>
+
+
+<div id="text_question">
+  <h6>Text Question</h6>
+  Question
+  <div class="mdl-textfield mdl-js-textfield">
+    <input class="mdl-textfield__input"  id="question"  type="text" id="sample1">
+    <label class="mdl-textfield__label"for="sample1">Please type your question</label>
+  </div>
+  <br />
+  Hint
+  <div class="mdl-textfield mdl-js-textfield">
+    <input class="mdl-textfield__input" type="text" id="tooltip">
+    <label class="mdl-textfield__label" for="sample1">Please type your hint</label>
+  </div>
+  <br />
+
+
+    <button id="add" class="mdl-button mdl-js-button mdl-button--raised">
+      Add
+    </button>
+</div>
+
+<div>
+  <h6>Multiple Choice Question</h6>
+  Question
+  <div class="mdl-textfield mdl-js-textfield">
+    <input class="mdl-textfield__input"  id="multiple_question"  type="text">
+    <label class="mdl-textfield__label"for="sample1">Please type your question</label>
+  </div>
+
+  <br />
+  Add choice
+  <div class="mdl-textfield mdl-js-textfield">
+    <input class="mdl-textfield__input"  id="choice"  type="text">
+  </div> <button id="add_choice" class="mdl-button mdl-js-button mdl-button--raised">
+    Add Choice
+  </button>
+
+
+
+  <br />
+  <button id="add_multiple" class="mdl-button mdl-js-button mdl-button--raised">
+    Add Question
+  </button>
+
+  <br />
+  Your Choices:
+  <div id="multiple_answers">
+
+  </div>
+
+</div>
+
+
+<div id="star_question">
+
+</div>
+
+<div id="scale_question">
+
+</div>
+
+
+  </br >
+  <h4>Live Preview</h4>
+  <br />
+
+  <div id="answers"></div>
+  <br >
+  <br />
+  <br />
+  <h4>Your Survey</h4>
+
+  <br />
+
+<div id="survey"></div>
+
+
+<script>
+  var myQuestion = {
+      type: '',
+      question: '',
+      answers: [],
+      lowBound: 0,
+      highBound: 0
+  };
+
+
+  var type = "text";
+  function clearQuestion() {
+   $('#question').val('');
+   $('#tooltip').val('');
+  }
+  var counter = 1;
+  function update() {
+    //empty previous content
+    $('#answers').empty();
+    $("#answers").append('Question ' + counter);
+    $('#answers').append('<div class="mdl-textfield mdl-js-textfield"> <input  id="text_answer"  class="mdl-textfield__input" type="text" id="sample1"><label class="mdl-textfield__label" for="sample1">' + $('#question').val() + '</label><div class="mdl-tooltip mdl-tooltip--large" for="text_answer">'+ $('#tooltip').text() + ' </div>');
+  }
+
+  function multipleUpdate() {
+    $('#answers').empty();
+    $('#answers').append('Question ' + counter);
+    $('#multiple_answers').clone().appendTo($('#answers'));
+  }
+
+  $(document).ready(function() {
+
+    $('#question').change(function() {
+      update();
+    });
+    //text button
+    $('#text').click(function() {
+      update();
+    });
+
+    $('#multiple').click(function() {
+
+    });
+
+    $('#add').click(function() {
+      update();
+      counter++;
+      $("#answers").clone().appendTo($("#survey"));
+      clearQuestion();
+      $('#answers').empty();
+    });
+
+    $('#add_choice').click(function() {
+      $('#multiple_answers').append('<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox-2"><input type="checkbox" id="checkbox-2" class="mdl-checkbox__input"><span class="mdl-checkbox__label">'+ $('#choice').val() + '</span></label>');
+      $('#choice').val('');
+      multipleUpdate();
+    });
+
+    $('#add_multiple').click(function() {
+      multipleUpdate();
+      counter++;
+      $('#answers').clone().appendTo($("#survey"));
+      $('#multiple_question').val('');
+      $('#multiple_answers').empty();
+      $('#answers').empty();
+    });
+  });
+</script>
