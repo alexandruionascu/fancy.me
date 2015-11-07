@@ -6,6 +6,15 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var ejsLayouts = require('express-ejs-layouts');
 var fs = require('fs');
+var connection = require('./db.js');
+
+var facebook = require('./facebook.js');
+var passport = require('passport');
+var session = require('express-session');
+var FacebookStrategy = require('passport-facebook').Strategy;
+
+var connection = require('./db.js');
+
 var app = express();
 
 // view engine setup
@@ -20,6 +29,53 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(ejsLayouts);
+//needed for facebook login
+app.use(session({
+  secret: 'keyboard cat'
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(obj, done) {
+  done(null, obj);
+});
+
+passport.use('facebook', new FacebookStrategy({
+
+    clientID        : facebook.fbConfig.appID,
+    clientSecret    : facebook.fbConfig.appSecret,
+    callbackURL     : facebook.fbConfig.callbackUrl,
+    profileFields: ['id', 'displayName', 'name', 'gender', 'picture', 'emails']
+  },
+
+  // facebook will send back the tokens and profile
+  function(access_token, refresh_token, profile, done) {
+      //check if the user exists
+        console.log(profile);
+        connection.connect();
+        var query = "INSERT INTO users(id, name, picture, token) VALUES('" + profile.id + "', '" + profile.displayName + "', '"+ profile.photos[0].value + "', '" + access_token + "');";
+        console.log(query);
+        connection.query(query, function(err, rows, fields) {
+          if(err)
+            console.log(err);
+          else  console.log('inserted');
+        });
+      return done(null, profile);
+  })
+);
+
+app.get('/auth/facebook', passport.authenticate('facebook', {authType: 'reauthenticate'}));
+app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/', successRedirect: '/home' }));
+
+
+app.get('/logout', function(req, res){
+    req.logout();
+    res.redirect('/');
+});
 
 //automaticly import controller files
 fs.readdirSync(__dirname + '/controllers').filter(function(file) {

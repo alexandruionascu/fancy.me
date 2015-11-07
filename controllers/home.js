@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET login page. */
+/* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('login', { title: 'Pineapple', layout: 'partials/login'});
+  res.render('home', { title: 'fancy.me', layout: 'partials/home', user: req.user});
 });
 
 module.exports = router;
